@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 // import Onboard from '@web3-onboard/core'
 import { init, useConnectWallet } from '@web3-onboard/react'
-import walletConnectModule, {
-  // WalletConnectOptions,
-} from "@web3-onboard/walletconnect";
+import walletConnectModule, { /* WalletConnectOptions */ } from "@web3-onboard/walletconnect";
 import injectedModule from '@web3-onboard/injected-wallets'
 import { ethers } from 'ethers'
 import './App.css';
 import config from './config.json';
-import ourCanisters from './our-canisters.json';
 
 const walletConnectOptions/*: WalletConnectOptions*/ = {
   projectId:
@@ -27,13 +24,12 @@ const walletConnect = walletConnectModule(walletConnectOptions);
 const injected = injectedModule()
 const wallets = [injected, walletConnect]
 
-const INFURA_ID = "2f0688745e5b4bb99ec8e3efc9ee1055";
 const chains = [
   {
     id: 1,
     token: 'ETH',
     label: 'Ethereum Mainnet',
-    rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
+    rpcUrl: `https://mainnet.infura.io/v3/${config.INFURA_ID}`,
   },
 ];
 
