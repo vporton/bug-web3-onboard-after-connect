@@ -11,11 +11,8 @@ import injectedModule from '@web3-onboard/injected-wallets'
 import { ethers } from 'ethers'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import { scoreSignature } from 'passport_client_dfinity-client';
-import { createActor as createBackendActor } from './declarations/backend'
 import config from './config.json';
 import ourCanisters from './our-canisters.json';
-import { HttpAgent } from '@dfinity/agent';
 
 const walletConnectOptions/*: WalletConnectOptions*/ = {
   projectId:
@@ -34,12 +31,13 @@ const walletConnect = walletConnectModule(walletConnectOptions);
 const injected = injectedModule()
 const wallets = [injected, walletConnect]
 
+const INFURA_ID = "2f0688745e5b4bb99ec8e3efc9ee1055";
 const chains = [
   {
     id: 1,
     token: 'ETH',
     label: 'Ethereum Mainnet',
-    rpcUrl: 'https://mainnet.infura.io/v3/${INFURA_ID}', // FIXME
+    rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
   },
 ];
 
@@ -65,12 +63,6 @@ const accountCenter = {
   },
 };
 
-// const onboard = Onboard({
-//   wallets,
-//   chains,
-//   appMetadata
-// })
-
 const onboard = init({
   appMetadata,
   apiKey: blockNativeApiKey,
@@ -83,72 +75,30 @@ const onboard = init({
 // - connect: ask for signature, store the signature, try to retrieve, show retrieval status
 // - recalculate: recalculate, show retrieval status
 function App() {
-  const agent = new HttpAgent({});
-  if (config.IS_LOCAL) {
-    agent.fetchRootKey();
-  }
-
-  const [score, setScore] = useState<number | 'didnt-connect' | 'retrieved-none'>('didnt-connect');
+  const [score, setScore] = useState<number | undefined>();
 
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
-
-  // create an ethers provider
-  // let ethersProvider: ethers.BrowserProvider;
-
-  if (wallet) {
-    // if using ethers v6 this is:
-    // ethersProvider = new ethers.BrowserProvider(wallet.provider, 'any')
-    // ethersProvider = new ethers.providers.Web3Provider(wallet.provider, 'any')
-  }
 
   async function readScore() {
     if (!wallet) {
       await connect();
     }
-    const ethersProvider = new ethers.BrowserProvider(wallet!.provider, 'any');
-    const signer = await ethersProvider.getSigner();
-    const { address, signature } = await scoreSignature(signer);
-    const backend = createBackendActor(ourCanisters.BACKEND_CANISTER_ID, {agent});
-    const score = await backend.scoreBySignedEthereumAddress({address, signature});
-    console.log(score)
-    setScore(score);
+    const provider = new ethers.BrowserProvider(wallet!.provider, 'any');
+    console.log('provider', provider);
+    const signer = await provider.getSigner();
+    console.log('signer', signer);
+    const address = await signer.getAddress()
+    console.log('address', address);
+    const message = "I certify that I am the owner of the Ethereum account\n" + address;
+    const signature = await signer.signMessage(message);
   }
 
   return (
     <div className="App">
-      <Container>
-        <Row>
-          <h1>Example Identity App</h1>
-          <Button disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : connect())}>
-            {connecting ? 'connecting' : wallet ? 'Disconnect Ethereum' : 'Connect Ethereum'}
-          </Button>
-          <p>This is an example app for DFINITY Internet Computer, that connects to{' '}
-            <a target='_blank' href="https://passport.gitcoin.co" rel="noreferrer">Gitcoin Passport</a>{' '}
-            to prove user's personhood (against so called <q>Sybil attack</q>, that is when
-            a user votes more than once).</p>
-          <p>The current version of this app requires use of an Ethereum wallet that you need
-            both in Gitcoin Passport and in this app. (So, in real Internet Computer apps
-            you will need two wallets: DFINITY Internet Computer wallet and Ethereum wallet.){' '}
-            You don't need to have any funds on your wallet to use this app (because you will use an Ethereum wallet{' '}
-            only to sign a message for this app, not for any transactions).
-            In the future <a target='_blank' href="https://portonvictor.org" rel="noreferrer">I</a> am going to
-            add DFINITY Internet Computer support to Gitcoin Passport, to avoid the need to create an Ethereum wallet
-            to verify personhood in apps like this.</p>
-          <h2>Steps</h2>
-          <ol>
-            <li>Go to <a target='_blank' href="https://passport.gitcoin.co" rel="noreferrer">Gitcoin Passport</a>{' '}
-              and prove your personhood.</li>
-            <li>Return to this app and check that it works with the same Ethereum wallet:<br/>
-              <Button onClick={readScore}>Check your identity score</Button>
-            </li>
-          </ol>
-          <p>Your identity score:{' '}
-            {score === undefined ? 'Click the above button to check.'
-              : `${score} ${score >= 20 ? '(Congratulations: You\'ve been verified.)'
-                : '(Sorry: It\'s <20, you are considered a bot.)'}`}
-          </p>
-        </Row>
-      </Container>
+      <h1>Example Identity App</h1>
+      <Button disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : connect())}>
+        {connecting ? 'connecting' : wallet ? 'Disconnect Ethereum' : 'Connect Ethereum'}
+      </Button>
     </div>
   );
 }
