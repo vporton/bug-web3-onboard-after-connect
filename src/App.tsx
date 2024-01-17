@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Button from 'react-bootstrap/Button';
 // import Onboard from '@web3-onboard/core'
 import { init, useConnectWallet } from '@web3-onboard/react'
 import walletConnectModule, {
@@ -9,7 +6,6 @@ import walletConnectModule, {
 } from "@web3-onboard/walletconnect";
 import injectedModule from '@web3-onboard/injected-wallets'
 import { ethers } from 'ethers'
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import config from './config.json';
 import ourCanisters from './our-canisters.json';
@@ -96,9 +92,9 @@ function App() {
   return (
     <div className="App">
       <h1>Example Identity App</h1>
-      <Button disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : connect())}>
+      <button disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : connect())}>
         {connecting ? 'connecting' : wallet ? 'Disconnect Ethereum' : 'Connect Ethereum'}
-      </Button>
+      </button>
     </div>
   );
 }
