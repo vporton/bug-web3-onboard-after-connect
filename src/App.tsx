@@ -67,8 +67,6 @@ const onboard = init({
 // - connect: ask for signature, store the signature, try to retrieve, show retrieval status
 // - recalculate: recalculate, show retrieval status
 function App() {
-  const [score, setScore] = useState<number | undefined>();
-
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
 
   async function readScore() {
@@ -87,8 +85,8 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Example Identity App</h1>
-      <button disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : connect())}>
+      <h1>Example Bug Demonstration App</h1>
+      <button disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : readScore())}>
         {connecting ? 'connecting' : wallet ? 'Disconnect Ethereum' : 'Connect Ethereum'}
       </button>
     </div>
