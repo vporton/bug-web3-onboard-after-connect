@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@types/node": "^16.18.70",
-    "@types/react": "^18.2.47",
+    "@types/react": "^18.3.17",
     "@types/react-dom": "^18.2.18",
     "@web3-onboard/core": "^2.21.2",
     "@web3-onboard/injected-wallets": "^2.10.11",
